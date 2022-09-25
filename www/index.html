@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Facility Calculator</title>
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+        <link rel="manifest" href="/site.webmanifest">
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+        <meta property="og:image:width" content="279">
+        <meta property="og:image:height" content="279">
+        <meta property="og:description" content="A tool to help with Facilities added in the 1.0 update of the videogame Foxhole">
+        <meta property="og:title" content="Facility Calculator">
+        <meta property="og:url" content="https://mrbazlow.github.io/CalcSite/">
+        <meta name="msapplication-TileColor" content="#00aba9">
+        <meta name="theme-color" content="#ffffff">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="./css/custom.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="col-lg-8 mx-auto p-5">
+            <header class="d-flex align-items-center pb-3 mb-3 border-bottom text-dark">
+              <a href="/" id="titleText"class="d-flex align-items-center text-decoration-none">
+                <img src="images/favi.png" class="me-3">
+                <span class="display-6">Facility Calculator</span> 
+              </a>
+              <div class="form-check form-switch ms-auto mt-3 me-3">
+                <label class="form-check-label ms-3" for="lightSwitch">
+                  <svg id="lightSwitchIcon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="white" class="bi bi-brightness-high" viewBox="0 0 16 16">
+                    <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+                  </svg>
+                </label>
+                <input class="form-check-input" type="checkbox" id="lightSwitch" />
+              </div>
+            </header>
+            <main>
+                <div class="row p-4 p-md-5 mb-4 rounded border bg-light">
+                    <div class="col-lg-9">
+                        <div class="card bg-dark">
+                            <table class="table table-striped" id="structuretable">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Structure</th>
+                                        <th scope="col">Task</th>
+                                        <th scope="col">Amount</th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-grid gap-5 d-md-block mt-2"> <!-- Buttons -->
+                            <div class="btn-group" aria-label="Buttons">
+                                <button type="button" class="btn btn-primary" id="newstrutbtn" onclick="newstructure()">Add Structure</button>
+                                <button type="button" class="btn btn-primary" id="resetbtn" onclick="location.reload()">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 align-self-center">
+                        <div class="col-sm-auto"> <!-- Power Card -->
+                            <div class="card text-bg-warning my-3">
+                                <h5 class="card-header">Power</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <div class="row text-center">
+                                            <div class="col-md-6">
+                                                Generated
+                                            </div>
+                                            <div class="col-md-6" id="PowerGen">
+                                                0
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <div class="row text-center">
+                                            <div class="col-md-6">
+                                                Consumed
+                                            </div>
+                                            <div class="col-md-6" id="PowerCon">
+                                                0
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <div class="row text-center">
+                                            <div class="col-md-6">
+                                                Free
+                                            </div>
+                                            <div class="col-md-6" id="PowerFree">
+                                                0
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card text-center my-2"> <!-- Stats Cards-->
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" id="ex1">
+                            <li class="nav-item">
+                                <a class="nav-link active " id="perMinTab" data-bs-toggle="tab" aria-controls="cards-tabs-1" aria-selected="true" href="#cards">Per Minute</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="perHourTab" data-bs-toggle="tab" aria-controls="cards-tabs-2" aria-selected="false" href="#cards">Per Hour</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body ">
+                        <div class="tab-content" id="ex1-content">
+                            <div class="tab-pane fade show active" id="cards" aria-labelledby="cards"> <!-- Values Fields -->
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="card text-bg-info mb-3">
+                                            <h5 class="card-header">Fluid (Litres)</h5>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Water
+                                                        </div>
+                                                        <div class="col-md-6" id="fWater">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Oil
+                                                        </div>
+                                                        <div class="col-md-6" id="fOil">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Petrol
+                                                        </div>
+                                                        <div class="col-md-6" id="fPetrol">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Diesel
+                                                        </div>
+                                                        <div class="col-md-6" id="fDiesel">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Heavy Oil
+                                                        </div>
+                                                        <div class="col-md-6" id="fHOil">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Enriched Oil
+                                                        </div>
+                                                        <div class="col-md-6" id="fEOil">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="card text-bg-secondary mb-3">
+                                            <h5 class="card-header">Construction Materials</h5>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Construction Materials
+                                                        </div>
+                                                        <div class="col-md-6" id="cMats">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Processed Construction Materials
+                                                        </div>
+                                                        <div class="col-md-6" id="pCMats">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Steel Construction Materials
+                                                        </div>
+                                                        <div class="col-md-6" id="sCMats">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="card text-bg-secondary mb-3">
+                                            <h5 class="card-header">Assembly Materials</h5>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Assembly Materials I
+                                                        </div>
+                                                        <div class="col-md-6" id="asMat1">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Assembly Materials II
+                                                        </div>
+                                                        <div class="col-md-6" id="asMat2">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Assembly Materials III
+                                                        </div>
+                                                        <div class="col-md-6" id="asMat3">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Assembly Materials IV
+                                                        </div>
+                                                        <div class="col-md-6" id="asMat4">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Assembly Materials V
+                                                        </div>
+                                                        <div class="col-md-6" id="asMat5">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="card text-bg-danger mb-3">
+                                            <h5 class="card-header">Ammunition</h5>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Flame Ammo
+                                                        </div>
+                                                        <div class="col-md-6" id="aFlame">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            250mm
+                                                        </div>
+                                                        <div class="col-md-6" id="a250">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            3C Rocket
+                                                        </div>
+                                                        <div class="col-md-6" id="a3c">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            4C Rocket
+                                                        </div>
+                                                        <div class="col-md-6" id="a4c">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            75mm
+                                                        </div>
+                                                        <div class="col-md-6" id="a75">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            94.5mm
+                                                        </div>
+                                                        <div class="col-md-6" id="a945">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            300mm
+                                                        </div>
+                                                        <div class="col-md-6" id="a300">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            120mm
+                                                        </div>
+                                                        <div class="col-md-6" id="a120">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            150mm
+                                                        </div>
+                                                        <div class="col-md-6" id="a150">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="card text-bg-success mb-3">
+                                            <h5 class="card-header">Resources</h5>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Scrap
+                                                        </div>
+                                                        <div class="col-md-6" id="rScrap">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Coal
+                                                        </div>
+                                                        <div class="col-md-6" id="rCoal">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Coke
+                                                        </div>
+                                                        <div class="col-md-6" id="rCoke">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Components
+                                                        </div>
+                                                        <div class="col-md-6" id="rComp">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Damaged Components
+                                                        </div>
+                                                        <div class="col-md-6" id="rDComp">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Sulfur
+                                                        </div>
+                                                        <div class="col-md-6" id="rSulfur">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Explosive Materials
+                                                        </div>
+                                                        <div class="col-md-6" id="rEMat">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            High Explosive Materials
+                                                        </div>
+                                                        <div class="col-md-6" id="rHEMat">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="card text-bg-light mb-3">
+                                            <h5 class="card-header">Misc.</h5>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Garrison Supplies
+                                                        </div>
+                                                        <div class="col-md-6" id="mGsupp">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Sandbags
+                                                        </div>
+                                                        <div class="col-md-6" id="mSand">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Barbed Wire
+                                                        </div>
+                                                        <div class="col-md-6" id="mBarb">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Metal Beams
+                                                        </div>
+                                                        <div class="col-md-6" id="mMBeam">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Concrete
+                                                        </div>
+                                                        <div class="col-md-6" id="mConc">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <div class="row text-center">
+                                                        <div class="col-md-6">
+                                                            Pipe
+                                                        </div>
+                                                        <div class="col-md-6" id="mPipe">
+                                                            0
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+            </main>
+        </div>   
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./js/boxoftools.js"></script>
+    <script src="./js/switch.js"></script>
+</html>
