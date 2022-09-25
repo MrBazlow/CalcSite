@@ -190,7 +190,7 @@ function newstructure() {
         "aria-label": "Amount Selection Field",
         "disabled": ""
     })
-    for (let i = 1; i < 11; i++) {
+    for (let i = 1; i < 21; i++) {
         amountSelect.options[amountSelect.options.length] = new Option (i);
         amountColumn.appendChild(amountSelect);
     }
@@ -276,16 +276,12 @@ function recompute() {
     setText("PowerFree", powerlimit(currentvalues[0] - currentvalues[1]));
 } 
 
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    console.log("Dark Mode desired");                                   // dark mode detection
-}
 
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-    const newColorScheme = event.matches ? "dark" : "light";            // dark mode monitor
-});
 
 /*
     TODO:
+    Migrate buttons to addeventlistener
+    Do calculations from inputs instead of pre-processed
     Migrate nodelist to JSON
     Toggle Power slider
 */
