@@ -1,99 +1,41 @@
-const structuresroutines = {
-    "Structure": ["Task"],
-    "Ammunition Factory": ["Flame Ammo", "250mm", "3C Rocket", "4C Rocket", "75mm", "94.5mm", "300mm", "120mm", "150mm"],
-    "Coal Harvester": ["Harvest Coal"],
-    "Coal Refinery": ["Basic Coke", "Coke Furnace", "Coal Liquefier", "Advanced Coal Liquefier"],
-    "Component Harvester": ["Harvest Components", "Harvest Damaged Components"],
-    "Large Assembly Factory": ["Factory Enabled", "Factory Disabled"],
-    "Light Vehicle Assembly Station": ["Station Enabled", "Station Disabled"],
-    "Maintenance Tunnel": ["Basic Garrison Supplies"],
-    "Materials Factory": ["Basic Construction Materials", "Assembly Materials 1", "Assembly Materials 2", "Metal Press Bulk Construction Materials", "Smelter Bulk Construction Materials", "Scrap for Sandbags", "Scrap for Barbed Wire"],
-    "Metalworks Factory": ["Basic Processed Construction Materials", "Basic Pipe", "Assembly Materials 4", "Assembly Materials 3", "Furnace Bulk Processed Construction Materials", "Processed Construction Materials and Metal Beams", "Damaged Components for Components", "Steel Construction Materials", "Bulk Steel Construction Materials", "Assembly Materials 5"],
-    "Oil Refinery": ["Basic Petrol", "Reformer Petrol", "Cracking Unit Heavy Oil", "Petrochemical Plant Enriched Oil"],
-    "Oil Well": ["Basic Oil", "Electric Oil", "Electric Oil Manual", "Fracking Oil", "Fracking Oil Manual"],
-    "Power Plant": ["Diesel Power", "Petrol Power"],
-    "Power Station": ["Oil Power", "Coal Power", "Heavy Oil Power", "Coke Power"],
-    "Scrap Harvester": ["Harvest Scrap"],
-    "Stationary Crane": ["Crane Enabled", "Crane Disabled"],
-    "Sulfur Harvester": ["Harvest Sulfur"],
-    "Water Pump": ["Basic Water", "Electric Water", "Electric Water Manual"],
+async function getJson(url) {
+    let response = await fetch(url);  
+    return response.json();
+}
+var structureObject = {};
+
+async function loadDataAndPageEvents() {
+    structureObject = JSON.parse(JSON.stringify(await getJson('./js/data.min.json')))
+
+    for (i = 0; i < 2; i++) {   // Pre-populate table
+        newstructure()
+    }
+    
+    document.getElementById("newstrutbtn").addEventListener("click", function() {
+        newstructure()
+    });
+    document.getElementById("resetbtn").addEventListener("click", function() {
+        resetTable();
+    });
+
+    document.getElementById("perMinTab").addEventListener("click", recompute);
+    document.getElementById("perHourTab").addEventListener("click", recompute);
 }
 
-const routinevalues = {
-    "Task": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Flame Ammo": [0, 4, 0, 0, 0, 0, 0, 0, -2.4, 0, 0, 0, 0, 0, 0, 0, 2.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2.4, 0, 0, 0, 0, 0, 0],
-    "250mm": [0, 4, 0, 0, 0, 0, 0, 0, -10, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, 0, 0, 0, 0, 0, 0],
-    "3C Rocket": [0, 4, 0, 0, 0, 0, 0, 0, -4.8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2.4, 0, 0, 0, 0, 0, 0],
-    "4C Rocket": [0, 4, 0, 0, 0, 0, 0, 0, -4.8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2.4, 0, 0, 0, 0, 0, 0],
-    "75mm": [0, 4, 0, 0, 0, 0, 0, 0, -4.8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4.8, 0, 0, 0, 0, 0, 0],
-    "94.5mm": [0, 4, 0, 0, 0, 0, 0, 0, -4.8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4.8, 0, 0, 0, 0, 0, 0],
-    "300mm": [0, 6, 0, 0, 0, 0, 0, 0, -9.6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, -14.4, 0, 0, 0, 0, 0, 0],
-    "120mm": [0, 4, 0, 0, 0, 0, 0, 0, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, -12, 0, 0, 0, 0, 0, 0, 0],
-    "150mm": [0, 4, 0, 0, 0, 0, 0, 0, -9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0],
-    "Harvest Coal": [0, 0, 0, 0, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 250, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Basic Coke": [0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -100, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Coke Furnace": [0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -100, 82.5, 0, 0, 7.5, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Coal Liquefier": [0, 4, -25, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0],
-    "Advanced Coal Liquefier": [0, 4, -33.33, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -100, 86.67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Harvest Components": [0, 0, 0, 0, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Harvest Damaged Components": [0, 0, 0, 0, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Factory Enabled": [0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Factory Disabled": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Station Enabled": [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Station Disabled": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Basic Garrison Supplies": [0, 2, 0, 0, 0, 0, 0, 0, -0.27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.67, 0, 0, 0, 0, 0], 
-    "Basic Construction Materials": [0, 2, 0, 0, 0, 0, 0, 0, 2.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Assembly Materials 1": [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -15, 0, -75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Assembly Materials 2": [0, 2, 0, 0, -50, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Metal Press Bulk Construction Materials": [0, 4, 0, 0, -60, 0, 0, 0, 7.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Smelter Bulk Construction Materials": [0, 4, 0, 0, 0, 0, 0, 0, 7.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -36, 0, -60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Scrap for Sandbags": [0, 2, 0, 0, 0, 0, 0, 0, 2.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -60, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0],
-    "Scrap for Barbed Wire": [0, 2, 0, 0, 0, 0, 0, 0, 2.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0],
-    "Basic Processed Construction Materials": [0, 5, 0, 0, 0, 0, 0, 0, -3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Basic Pipe": [0, 5, 0, 0, 0, 0, 0, 0, 0, -1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5], 
-    "Assembly Materials 4": [0, 5, 0, 0, 0, 0, -33, 0, 0, -0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Assembly Materials 3": [0, 5, 0, 0, 0, 0, 0, 0, -1.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Furnace Bulk Processed Construction Materials": [0, 8, 0, 0, 0, 0, -6, 0, -3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Processed Construction Materials and Metal Beams": [0, 5, 0, 0, 0, 0, 0, 0, -3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -20, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-    "Damaged Components for Components": [0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13.33, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Steel Construction Materials": [0, 9, 0, 0, 0, 0, -23.33, 0, 0, -2, 0.67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -133.33, 0, 0, -43.33, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Bulk Steel Construction Materials": [0, 12, -66.67, 0, 0, 0, 0, -60, 0, -6, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -250, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Assembly Materials 5": [0, 8, 0, 0, 0, 0, 0, 0, 0, 0, -1.5, -5, -5, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -122.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Basic Petrol": [0, 1, 0, -60, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Reformer Petrol": [0, 1, -12, -48, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Cracking Unit Heavy Oil": [0, 1.5, 0, -56.25, 0, 0, 33.75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Petrochemical Plant Enriched Oil": [0, 6, 0, 0, 0, 0, -9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -18, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Basic Oil": [0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Electric Oil": [0, 2, 0, 112.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],
-    "Electric Oil Manual": [0, 2, 0, 115.38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Fracking Oil": [0, 3, -37.5, 150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Fracking Oil Manual": [0, 3, -50, 150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Diesel Power": [5, 0, 0, 0, 0, -33.33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Petrol Power": [12, 0, 0, 0, -33.33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Oil Power": [10, 0, 0, -33.33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Coal Power": [10, 0, -16.67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Heavy Oil Power": [16, 0, 0, 0, 0, 0, -25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.5, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Coke Power": [16, 0, -12.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -30, 0, 0, 2.5, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Harvest Scrap": [0, 0, 0, 0, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 250, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Crane Enabled": [0, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Crane Disabled": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Harvest Sulfur": [0, 0, 0, 0, 0, 0, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Basic Water": [0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Electric Water": [0, 0.5, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    "Electric Water Manual": [0, 0.5, 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-}
-
-window.addEventListener('load', (event) => {        // On page load, do this
-    for (let i = 0; i < 2; i++) newstructure();
-});
-
-document.getElementById("perMinTab").addEventListener("click", recompute)
-document.getElementById("perHourTab").addEventListener("click", recompute)
+loadDataAndPageEvents();
 
 function deleteStructure() {
     const row = this.parentNode.parentNode;
     const tbody = row.parentNode;
     tbody.removeChild(row);
+    recompute();
+}
+
+function resetTable() {                             
+    document.getElementById("structuretable").lastElementChild.replaceChildren();   // ECMA2022
+    for (i = 0; i < 2; i++) {                                                       // Re-populate Table
+        newstructure();
+    }
     recompute();
 }
 
@@ -125,10 +67,16 @@ function newstructure() {
         row.appendChild(column);
         return column;
     }
+    
+    function FindSearchElement(soughtElementID, indent) {       // Gets the Structure dropdown menu ID to find the other related dropdowns
+        let id_list = Array.from(document.querySelector("#structuretable").querySelectorAll("select"));
+        return document.getElementById(id_list.at(getIndexById(soughtElementID.target.id, id_list) + indent).getAttribute("id"));
+    }
 
+    const structurelist = Object.keys(structureObject);
     const newrow = document.createElement("tr");
     const structureColumn = createStructure(newrow);
-    const structureSelect = document.createElement("select");
+    const structureSelect = document.createElement("select");   // Starting point of creating Structure dropdown menu
     setAttributes(structureSelect, {
         "id": "id" + Math.random().toString(16).slice(2),
         "class": "form-select",
@@ -136,53 +84,54 @@ function newstructure() {
     })
 
     structureSelect.addEventListener('change', function(element) {
-        let tableSelects = document.querySelector("#structuretable").querySelectorAll("select");
-        let id_list = Array.from(tableSelects);
-        let routineElement = document.getElementById(id_list.at(getIndexById(element.target.id, id_list) + 1).getAttribute("id"));
-        let amountElement = document.getElementById(id_list.at(getIndexById(element.target.id, id_list) + 2).getAttribute("id"));
+        let routineElement = FindSearchElement(element, 1);
+        let amountElement = FindSearchElement(element, 2);
         routineElement.length = 1;
         amountElement.value = 1;
         amountElement.setAttribute("disabled","");
-        routineElement.removeAttribute("disabled","");
         recompute();
-        let b = structuresroutines[element.target.value];
-        if (this.value.includes("Structure")) {
+        if (this.value == "0") {
             routineElement.setAttribute("disabled","");
+            amountElement.setAttribute("disabled","");
+        } else {
+            routineElement.removeAttribute("disabled","");
+            amountElement.removeAttribute("disabled","");
         }
-        for (let i = 0; i < b.length; i++) {
-            routineElement.options[routineElement.options.length] = new Option(b[i], b[i]);
+        let b = this.value;
+        let c = Object.keys(Object.values(structureObject)[b])
+        while (routineElement.firstChild) {
+            routineElement.firstChild.remove()
+        }
+        for (let i = 0; i < c.length; i++) {
+            routineElement.options[routineElement.options.length] = new Option(c[i], b[i]);
         }
     });
-    for (let a in structuresroutines) {
-        structureSelect.options[structureSelect.options.length] = new Option(a, a);
+    for (let i = 0; i < structurelist.length; i++) {
+        structureSelect.options[structureSelect.options.length] = new Option(structurelist[i], i);
         structureColumn.appendChild(structureSelect);
     }
 
     const routineColumn = createStructure(newrow);
-    const routineSelect = document.createElement("select");
-    routineSelect.addEventListener('change', function(element) {
-        let tableSelects = document.querySelector("#structuretable").querySelectorAll("select");
-        let id_list = Array.from(tableSelects);
-        let amountElement = document.getElementById(id_list.at(getIndexById(element.target.id, id_list) + 1).getAttribute("id"));
-        recompute();
-        amountElement.removeAttribute("disabled","");
-    });
-
+    const routineSelect = document.createElement("select");     // Starting point of creating Task dropdown menu
     setAttributes(routineSelect, {
         "id": "id" + Math.random().toString(16).slice(2),
         "class": "form-select",
-        "aria-label": "Routine Selection Field",
+        "aria-label": "Task Selection Field",
         "disabled": ""
     })
 
-    let b = structuresroutines[structureSelect.value]
-    for (let i = 0; i < b.length; i++) {
-        routineSelect.options[routineSelect.options.length] = new Option (b[i], b[i]);
+    routineSelect.addEventListener('change', function(element) {
+        recompute();
+    });
+
+    let c = Object.keys(Object.values(structureObject)[0]);
+    for (let i = 0; i < c.length; i++) {
+        routineSelect.options[routineSelect.options.length] = new Option(c[i], [i]);
         routineColumn.appendChild(routineSelect);
     }
 
     const amountColumn = createStructure(newrow);
-    const amountSelect = document.createElement("select");
+    const amountSelect = document.createElement("select");      // Starting point of creating Amount dropdown menu
     amountSelect.addEventListener('change', recompute);
     setAttributes(amountSelect, {
         "id": "id" + Math.random().toString(16).slice(2),
@@ -206,8 +155,7 @@ function newstructure() {
         "aria-label": "Delete Row"
     })
     removeColumn.appendChild(removeBtn);
-    let table = document.getElementById("structuretable");
-    let tbody = table.querySelector("tbody") || table;
+    let tbody = document.getElementById("structuretable").querySelector("tbody") || table;
     tbody.appendChild(newrow);
 }
 
@@ -227,29 +175,22 @@ function tidy(num) {                                // Ensures only two decimal 
 }
 
 function recompute() {
-
-    let currentvalues = Array(39).fill(0);          // Reset counter
+    let currentvalues = Array(39).fill(0);                                                                      // Reset counter
     let structureTableArray = Array.from(document.querySelector("#structuretable").querySelectorAll("select"));
-    let selectedRoutinesArrayText = [];
-    let selectedRoutinesArray = getColumnCells(structureTableArray, 3, 1);
-    let selectedAmountsArrayValue = [];
-    let selectedAmountsArray = getColumnCells(structureTableArray, 3, 2);
+    let selectedStructureArray = getColumnCells(structureTableArray, 3, 0);
     let totalRoutinesArray = [];
-
+    for (let i = 0 ; i < selectedStructureArray.length; i++) {    
+        let a = Object.keys(structureObject)[selectedStructureArray[i].value];                                  // Get name of Structure in column
+        let b = (Object.keys(structureObject[a])[getColumnCells(structureTableArray, 3, 1)[i].selectedIndex]);  // Get name of Task in column                                                     
+        let c = getColumnCells(structureTableArray, 3, 2)[i].value;                                                                  // Get Amount in column
+        let d = Object.values(structureObject[a][b]);                                                           // Get Values for Structure>Task
+        for (let i = 0; i < c; i++) {                                                                           // Add Values x Amount
+            totalRoutinesArray.push(d);
+        }
+    }
     
-    for (let i = 0; i < selectedAmountsArray.length; i++) {             // Fetch current Amount selections
-        selectedAmountsArrayValue.push(selectedAmountsArray[i].value);  // As Strings
-    }
-    selectedAmountsArrayValue = selectedAmountsArrayValue.map(Number);  
-    for (let i = 0; i < selectedRoutinesArray.length; i++) {            // Fetch current Routine selections
-        selectedRoutinesArrayText.push(selectedRoutinesArray[i].options[selectedRoutinesArray[i].selectedIndex].text);
-    }
-    for (let i = 0; i < selectedRoutinesArrayText.length; i++) {
-        totalRoutinesArray.push(Array(selectedAmountsArrayValue[i]).fill(selectedRoutinesArrayText[i]));
-    }
-    totalRoutinesArray = totalRoutinesArray.flat();                     // Turns it from an array of arrays into one big array
-    for (let i = 0; i < totalRoutinesArray.length; i++) {               // Calculates Routines x Amount and adds values to counter
-        let x = routinevalues[totalRoutinesArray[i]];
+    for (let i = 0; i < totalRoutinesArray.length; i++) {                                   // Adds the values from totalRoutinesArray to currentvalues array
+        let x = totalRoutinesArray[i];
         currentvalues = currentvalues.map(function (num, idx) {
             return num + x[idx];
         })
@@ -274,14 +215,142 @@ function recompute() {
         }
     }
     setText("PowerFree", powerlimit(currentvalues[0] - currentvalues[1]));
-} 
+}
 
+/**
+ *  Light Switch @version v0.1.4
+ *  https://github.com/han109k/light-switch-bootstrap
+ */
 
+ (function () {
+    let lightSwitch = document.getElementById('lightSwitch');
+    if (!lightSwitch) {
+      return;
+    }
+  
+    /**
+     * @function darkmode
+     * @summary: changes the theme to 'dark mode' and save settings to local stroage.
+     * Basically, replaces/toggles every CSS class that has '-light' class with '-dark'
+     */
+    function darkMode() {
+      document.querySelectorAll('.bg-light').forEach((element) => {
+        element.className = element.className.replace(/-light/g, '-dark');
+      });
+  
+      document.body.classList.add('bg-dark');
+  
+      if (document.body.classList.contains('text-dark')) {
+        document.getElementById("titleText").classList.replace('text-dark', 'text-light');
+        document.getElementById("structuretable").parentNode.classList.replace('bg-light', 'bg-dark')
+        document.body.classList.replace('text-dark', 'text-light');
+        
+      } else {
+        document.getElementById("titleText").classList.add('text-light');
+        document.getElementById("structuretable").parentNode.classList.add('bg-dark')
+        document.body.classList.add('text-light');
+      }
+  
+      if (document.getElementById("lightSwitchIcon").getAttribute("fill").includes("black")) {
+        document.getElementById("lightSwitchIcon").setAttribute("fill", "white")
+      }
+  
+      // Tables
+      var tables = document.querySelectorAll('table');
+      for (var i = 0; i < tables.length; i++) {
+        // add table-dark class to each table
+        tables[i].classList.add('table-dark');
+      }
+  
+      // set light switch input to true
+      if (!lightSwitch.checked) {
+        lightSwitch.checked = true;
+      }
+      localStorage.setItem('lightSwitch', 'dark');
+    }
+  
+    /**
+     * @function lightmode
+     * @summary: changes the theme to 'light mode' and save settings to local stroage.
+     */
+    function lightMode() {
+      document.querySelectorAll('.bg-dark').forEach((element) => {
+        element.className = element.className.replace(/-dark/g, '-light');
+      });
+  
+      document.body.classList.add('bg-light');
+  
+      if (document.body.classList.contains('text-light')) {
+        document.getElementById("titleText").classList.replace('text-light', 'text-dark');
+        document.getElementById("structuretable").parentNode.classList.replace('bg-dark', 'bg-light')
+        document.body.classList.replace('text-light', 'text-dark');
+      } else {
+        document.getElementById("titleText").classList.add('text-dark');
+        document.getElementById("structuretable").parentNode.classList.add('bg-light')
+        document.body.classList.add('text-dark');
+      }
+  
+      if (document.getElementById("lightSwitchIcon").getAttribute("fill").includes("white")) {
+        document.getElementById("lightSwitchIcon").setAttribute("fill", "black")
+      }
+  
+      // Tables
+      var tables = document.querySelectorAll('table');
+      for (var i = 0; i < tables.length; i++) {
+        if (tables[i].classList.contains('table-dark')) {
+          tables[i].classList.remove('table-dark');
+        }
+      }
+  
+      if (lightSwitch.checked) {
+        lightSwitch.checked = false;
+      }
+      localStorage.setItem('lightSwitch', 'light');
+    }
+  
+    /**
+     * @function onToggleMode
+     * @summary: the event handler attached to the switch. calling @darkMode or @lightMode depending on the checked state.
+     */
+    function onToggleMode() {
+      if (lightSwitch.checked) {
+        darkMode();
+      } else {
+        lightMode();
+      }
+    }
+  
+    /**
+     * @function getSystemDefaultTheme
+     * @summary: get system default theme by media query
+     */
+    function getSystemDefaultTheme() {
+      const darkThemeMq = window.matchMedia('(prefers-color-scheme: dark)');
+      if (darkThemeMq.matches) {
+        return 'dark';
+      }
+      return 'light';
+    }
+  
+    function setup() {
+      var settings = localStorage.getItem('lightSwitch');
+      if (settings == null) {
+        settings = getSystemDefaultTheme();
+      }
+  
+      if (settings == 'dark') {
+        lightSwitch.checked = true;
+      }
+  
+      lightSwitch.addEventListener('change', onToggleMode);
+      onToggleMode();
+    }
+  
+    setup();
+  })();
 
 /*
-    TODO:
-    Migrate buttons to addeventlistener
+    TODO: 
     Do calculations from inputs instead of pre-processed
-    Migrate nodelist to JSON
     Toggle Power slider
 */
